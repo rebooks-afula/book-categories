@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מאתר קטגוריות ספרים - גרסה מלאה</title>
+    <style>
+        :root { --p: #2c3e50; --a: #3498db; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #app { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 500px; width: 90%; text-align: center; }
+        .q { font-size: 1.25rem; margin-bottom: 20px; font-weight: bold; color: var(--p); line-height: 1.4; }
+        .btns { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 14px; border: 2px solid var(--a); background: white; color: var(--a); border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; text-align: right; transition: 0.2s; }
+        button:hover { background: var(--a); color: white; transform: translateY(-1px); }
+        .res-box { background: #e8f4fd; padding: 25px; border-radius: 12px; border-right: 8px solid var(--a); font-size: 1.7rem; color: var(--p); margin-bottom: 15px; }
+        .tip { color: #666; font-size: 0.85rem; font-style: italic; margin-bottom: 20px; }
+        .nav { margin-top: 20px; display: flex; gap: 20px; justify-content: center; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 15px; }
+        .link { color: #888; text-decoration: underline; cursor: pointer; }
+        #err { color: red; margin-top: 10px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="content">טוען נתונים...</div>
+    <div id="err"></div>
+</div>
+
+<script>
+    const steps = {
+        start: {
+            t: "באיזו שפה הספר?",
+            o: [{t: "אנגלית", n: "en"}, {t: "עברית / שפה אחרת", n: "aud"}]
+        },
+        en: {
+            t: "מהו סגנון הספר (באנגלית)?",
+            o: [
+                {t: "Detective, Murder, Thriller, Mystery", n: "r_אנגלית מתח"},
+                {t: "Love, Relationship, Romance, Heart", n: "r_אנגלית רומן"},
+                {t: "Dragon, Magic, Future, Space, Fantasy", n: "r_אנגלית פנטזיה"},
+                {t: "Novel, Story, Classics, Prose", n: "r_אנגלית פרוזה"}
+            ]
+        },
+        aud: {
+            t: "מי קהל היעד של הספר?",
+            o: [{t: "ילדים או נוער", n: "kids"}, {t: "מבוגרים", n: "adult_type"}]
+        },
+        kids: {
+            t: "מה רמת הקריאה או הגיל?",
+            o: [
+                {t: "פעוטות, קשיח, דפי קרטון, ציורים", n: "r_ילדים קשיחים"},
+                {t: "מנוקד, אותיות גדולות, ראשית קריאה", n: "r_ראשית קריאה"},
+                {t: "מעשייה, אגדה, חברות, בעלי חיים", n: "r_ילדים כללי"},
+                {t: "תיכון, אהבה ראשונה, ללא ניקוד", n: "r_נוער"}
+            ]
+        },
+        adult_type: {
+            t: "האם הספר עלילתי או ספר מידע?",
+            o: [{t: "עלילתי (סיפור)", n: "fic_genre"}, {t: "מידע / מחקר / הדרכה", n: "nf"}]
+        },
+        fic_genre: {
+            t: "מהו הז'אנר המרכזי?",
+            o: [
+                {t: "מתח, פעולה, משטרה, ריגול", n: "r_מתח"},
+                {t: "רומן, אהבה, יחסים", n: "r_רומן"},
+                {t: "סיפורת כללית, דרמה, פרוזה", n: "r_פרוזה כללית"}
+            ]
+        },
+        nf: {
+            t: "באיזה תחום עוסק ספר העיון?",
+            o: [
+                {t: "היסטוריה, צבא, פוליטיקה", n: "hist"},
+                {t: "יהדות, פסיכולוגיה, ביוגרפיה, מדע", n: "soul"},
+                {t: "בישול, בריאות, הורות, פנאי", n: "life"}
+            ]
+        },
+        hist: {
+            t: "חפשו מילת מפתח בתקציר:",
+            o: [
+                {t: "ציונות, ארץ ישראל, קום המדינה", n: "r_היסטוריית ישראל"},
+                {t: "נאצים, מחנות, הישרדות, מלחמת העולם ה-2", n: "r_שואה"},
+                {t: "האימפריה, המהפכה, המאה ה-19, עבר", n: "r_היסטוריה כללית"},
+                {t: "צה\"ל, אסטרטגיה, מוסד, שב\"כ", n: "r_צבא ובטחון"},
+                {t: "ממשל, דמוקרטיה, מפלגות, פוליטיקה", n: "r_פוליטיקה"}
+            ]
+        },
+        soul: {
+            t: "חפשו מילת מפתח בתקציר:",
+            o: [
+                {t: "הלכה, תלמוד, חז\"ל, מסורת, קבלה", n: "r_יהדות"},
+                {t: "טיפול, נפש, רגשות, מחקר, פסיכולוגיה", n: "r_פסיכולוגיה"},
+                {t: "הגות, מוסר, פילוסופיה, לוגיקה", n: "r_פילוסופיה"},
+                {t: "סיפור חייו, יומן, אוטוביוגרפיה", n: "r_ביוגרפיה"},
+                {t: "תגלית, אבולוציה, אקדמיה, חינוך", n: "r_מדע וחינוך"},
+                {t: "כסף, שוק ההון, ניהול, כלכלה", n: "r_כלכלה"},
+                {t: "ציור, אדריכלות, עיצוב, אמנות", n: "r_אמנות"}
+            ]
+        },
+        life: {
+            t: "מהו תחום ההדרכה?",
+            o: [
+                {t: "אושר, רוחניות, מדיטציה, השראה", n: "r_עידן חדש ועזרה עצמית"},
+                {t: "תינוקות, חינוך ילדים, גמילה, הורות", n: "r_הורות"},
+                {t: "מתכונים, מטבח, אפייה, תזונה", n: "r_בישול"},
+                {t: "רפואה, ויטמינים, כושר, מחלות", n: "r_בריאות"},
+                {t: "מסלולים, מפה, חיות, אקולוגיה", n: "r_טבע וטיול"},
+                {t: "בדיחות, מצחיק, סאטירה", n: "r_הומור"}
+            ]
+        }
+    };
+
+    let history = [];
+
+    function render(key, isBack = false) {
+        try {
+            const div = document.getElementById('content');
+            
+            if (key.startsWith('r_')) {
+                const name = key.replace('r_', '');
+                div.innerHTML = `
+                    <div class="res-box"><strong>${name}</strong></div>
+                    <div class="tip">זכור: אם הספר נראה רציני ומחקרי ללא קטגוריה מדויקת, מקומו ב'עיון'.</div>
+                    <div class="nav"><span class="link" onclick="goBack()">🔙 חזור</span> | <span class="link" onclick="render('start')">🔄 התחלה</span></div>
+                `;
+                return;
+            }
+
+            const step = steps[key];
+            if (!isBack && key !== 'start') {
+                const now = div.getAttribute('data-k');
+                if (now) history.push(now);
+            }
+            if (key === 'start') history = [];
+            div.setAttribute('data-k', key);
+
+            let html = `<div class="q">${step.t}</div><div class="btns">`;
+            step.o.forEach(btn => {
+                html += `<button onclick="render('${btn.n}')">${btn.t}</button>`;
+            });
+            html += `</div><div class="nav">`;
+            if (history.length > 0) html += `<span class="link" onclick="goBack()">חזור</span> | `;
+            html += `<span class="link" onclick="render('start')">התחלה</span></div>`;
+            div.innerHTML = html;
+        } catch (e) {
+            document.getElementById('err').innerText = "שגיאת קוד: " + e.message;
+        }
+    }
+
+    window.goBack = () => { if (history.length > 0) render(history.pop(), true); };
+    window.render = render;
+    window.onload = () => render('start');
+</script>
+
+</body>
+</html>
