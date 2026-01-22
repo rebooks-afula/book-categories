@@ -78,8 +78,7 @@
 <body>
 
 <div id="app">
-    <div id="content">
-        </div>
+    <div id="content"></div>
 </div>
 
 <script>
@@ -119,87 +118,41 @@
         adult_type: {
             text: "האם הספר עלילתי או ספר מידע?",
             options: [
-                { text: "עלילתי", next: "fiction_genre" },
-                { text: "מידע / מחקר", next: "non_fiction_genre" }
+                { text: "עלילתי (פרוזה, מתח, רומן)", next: "res_פרוזה/מתח/רומן" },
+                { text: "מידע / מחקר / הדרכה", next: "non_fiction_genre" }
             ]
         },
-        fiction_genre: {
-            text: "מהו הז'אנר המרכזי? (בדוק קודם אם יש לוגו 'עם עובד')",
+        non_fiction_genre: {
+            text: "באיזה תחום הספר עוסק?",
             options: [
-                { text: "ספר שנותן מידע", next: "history_genre" },
-                { text: "ספר מחקרי", next: "soul_genre" },
-                { text: "ספר הדרכה", next: "lifestyle_genre" }
+                { text: "היסטוריה, צבא, פוליטיקה", next: "history_genre" },
+                { text: "יהדות, פסיכולוגיה, ביוגרפיה, מדע", next: "soul_genre" },
+                { text: "בישול, בריאות, הורות, פנאי", next: "lifestyle_genre" }
             ]
         },
         history_genre: {
             text: "חפשו את מילת המפתח המתאימה בתקציר",
             options: [
-                { text: "ציונות, ארץ ישראל, התיישבות, קום המדינה, מחתרות", next: "res_היסטוריית ישראל" },
-                { text: "נאצים, מחנות, הישרדות, גטו, עדות, מלחמת העולם ה-2", next: "res_שואה" },
+                { text: "ציונות, ארץ ישראל, התיישבות, קום המדינה", next: "res_היסטוריית ישראל" },
+                { text: "נאצים, מחנות, הישרדות, גטו, עדות", next: "res_שואה" },
                 { text: "האימפריה, המהפכה, המאה ה-19, עבר", next: "res_היסטוריה כללית" },
-                { text: "צה"ל, אסטרטגיה, קרב, מוסד, שב"כ, חיל", next "res_צבא ובטחון" },
-                { text: "ממשל, דמוקרטיה, מפלגות, שלטון, יחסים בינלאומיים", "res_פוליטיקה" }   
+                { text: "צה"ל, אסטרטגיה, קרב, מוסד, שב"כ", next: "res_צבא ובטחון" },
+                { text: "ממשל, דמוקרטיה, מפלגות, שלטון", next: "res_פוליטיקה" }
             ]
         },
         soul_genre: {
+            text: "חפשו את מילת המפתח המתאימה בתקציר",
             options: [
-                { text: "חפשו את מילת המפתח המתאימה בתקציר" },
-                { text: "הלכה, תלמוד, חז"ל, מסורת, תפילה, פרשת השבוע, קבלה", "res_יהדות" },
-                { text: "טיפול, נפש, רגשות, מחקר, התנהגות, פרויד", "res_פסיכולוגיה" },
-                { text: "הגות, מוסר, קיום, שאלות, לוגיקה", "res_פילוסופיה" },
-                { text: "סיפור חייו של, זה סיפור חיי, יומן, אוטוביוגרפיה", "res_ביוגרפיה" },
-                { text: "תגלית, אבולוציה, הוראה, למידה, אקדמיה", "res_מדע וחינוך" },
-                { text: "כסף, שוק ההון, ניהול, עסקים, השקעות, אינפלציה", "res_כלכלה" },
-                { text: "ציור, מוזיאון, אדריכלות, עיצוב, קולנוע", "res_אמנות" }
+                { text: "הלכה, תלמוד, חז"ל, מסורת, קבלה", next: "res_יהדות" },
+                { text: "טיפול, נפש, רגשות, מחקר, פרויד", next: "res_פסיכולוגיה" },
+                { text: "הגות, מוסר, קיום, לוגיקה", next: "res_פילוסופיה" },
+                { text: "סיפור חייו של, יומן, אוטוביוגרפיה", next: "res_ביוגרפיה" },
+                { text: "תגלית, אבולוציה, הוראה, אקדמיה", next: "res_מדע וחינוך" },
+                { text: "כסף, שוק ההון, ניהול, עסקים", next: "res_כלכלה" },
+                { text: "ציור, מוזיאון, אדריכלות, עיצוב", next: "res_אמנות" }
             ]
-        },    
-
+        },
         lifestyle_genre: {
+            text: "בחר את התחום המתאים:",
             options: [
-                { text: "אושר, הצלחה, רוחניות, מדיטציה, שינוי, השראה", next: "res_עידן חדש ועזרה עצמית" },
-                { text: "תינוקות, חינוך ילדים, גמילה, גיל ההתבגרות", next: "res_הורות" },
-                { text: "מתכונים, מטבח, אפייה, שף, תזונה", next: "res_בישול" },
-                { text: "רפואה, ויטמינים, כושר, מחלות, אריכות ימים", next "res_בריאות" },
-                { text: "מסלולים, מפה, חיות, סביבה, אקולוגיה", next "res_טבע וטיול" },
-                { text: "בדיחות, מצחיק, סאטירה", next "res_הומור" }
-        ]
-    };
-
-    function render(stepKey) {
-        const container = document.getElementById('content');
-        
-        if (stepKey.startsWith('res_')) {
-            const category = stepKey.replace('res_', '');
-            container.innerHTML = `
-                <div class="result-box">
-                    <span>הקטגוריה שנמצאה:</span>
-                    <strong class="result-category">${category}</strong>
-                    <p class="keywords">זכור: אם הספר נראה רציני ומחקרי ללא קטגוריה מדויקת, מקומו ב'עיון'.</p>
-                </div>
-                <div class="restart" onclick="render('start')">התחל מחדש</div>
-            `;
-            return;
-        }
-
-        const step = steps[stepKey];
-        let html = `<h1>איתור קטגוריית ספר</h1>`;
-        html += `<div class="question">${step.text}</div>`;
-        html += `<div class="options">`;
-        step.options.forEach(opt => {
-            html += `<button onclick="render('${opt.next}')">${opt.text}</button>`;
-        });
-        html += `</div>`;
-        html += `<div class="restart" onclick="render('start')">חזור להתחלה</div>`;
-        
-        container.innerHTML = html;
-    }
-
-    // הפעלה ראשונית
-    render('start');
-</script>
-
-</body>
-
-</html>
-
-
+                { text: "אושר, הצלחה,
