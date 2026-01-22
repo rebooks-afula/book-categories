@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מאתר קטגוריות ספרים</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        #app {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 { color: var(--primary); font-size: 1.5rem; margin-bottom: 1.5rem; }
+        .question { font-size: 1.2rem; margin-bottom: 2rem; color: #333; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        button {
+            padding: 12px 20px;
+            border: 2px solid var(--accent);
+            background: none;
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: var(--accent);
+            color: white;
+        }
+        .result-box {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            border-right: 5px solid var(--accent);
+        }
+        .result-category {
+            font-size: 1.8rem;
+            color: var(--primary);
+            display: block;
+            margin-top: 10px;
+        }
+        .keywords {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .restart {
+            margin-top: 20px;
+            color: #888;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="content">
+        </div>
+</div>
+
+<script>
+    const steps = {
+        start: {
+            text: "באיזו שפה הספר?",
+            options: [
+                { text: "אנגלית", next: "english" },
+                { text: "עברית / שפה אחרת", next: "audience" }
+            ]
+        },
+        english: {
+            text: "מהו סגנון הספר (באנגלית)?",
+            options: [
+                { text: "מתח (Detective, Thriller)", next: "res_אנגלית מתח" },
+                { text: "רומן (Love, Relationship)", next: "res_אנגלית רומן" },
+                { text: "פנטזיה (Dragon, Magic, Space)", next: "res_אנגלית פנטזיה" },
+                { text: "פרוזה (Novel, Story, Classics)", next: "res_אנגלית פרוזה" }
+            ]
+        },
+        audience: {
+            text: "מי קהל היעד של הספר?",
+            options: [
+                { text: "ילדים או נוער", next: "kids_youth" },
+                { text: "מבוגרים", next: "adult_type" }
+            ]
+        },
+        kids_youth: {
+            text: "מה רמת הקריאה או הגיל?",
+            options: [
+                { text: "דפי קרטון / פעוטות", next: "res_ילדים ספרים גדולים/קשיחים" },
+                { text: "מנוקד - אותיות גדולות (שלב 1)", next: "res_ראשית קריאה" },
+                { text: "מנוקד - אגדות / חיות / חברות", next: "res_ילדים כללי" },
+                { text: "ללא ניקוד - תיכון / הרפתקאות", next: "res_נוער" }
+            ]
+        },
+        adult_type: {
+            text: "האם הספר עלילתי (סיפור) או ספר מידע (עיון)?",
+            options: [
+                { text: "עלילתי (פרוזה)", next: "fiction_genre" },
+                { text: "מידע / מחקר (עיון)", next: "non_fiction_genre" }
+            ]
+        },
+        fiction_genre: {
+            text: "מהו הז'אנר המרכזי? (בדוק קודם אם יש לוגו 'עם עובד')",
+            options: [
+                { text: "רצח / בילוש / ריגול", next: "res_מתח" },
+                { text: "חלל / דרקונים / עתיד", next: "res_מד\"ב ופנטזיה" },
+                { text: "אהבה / גורל / רומנטיקה", next: "res_רומן רומנטי" },
+                { text: "חושני / פיתוי", next: "res_רומן ארוטי" },
+                { text: "שירה ומקצב", next: "res_שירה" },
+                { text: "סופר ישראלי", next: "res_פרוזה מקור" },
+                { text: "סופר זר / תרגום", next: "res_פרוזה תרגום" }
+            ]
+        },
+        non_fiction_genre: {
+            text: "מהו נושא העיון?",
+            options: [
+                { text: "היסטוריה / ציונות / שואה", next: "res_היסטוריה וצבא" },
+                { text: "פסיכולוגיה / פרויד / טיפול", next: "res_פסיכולוגיה" },
+                { text: "יהדות / הלכה / קבלה", next: "res_יהדות" },
+                { text: "עזרה עצמית / השראה / רוח", next: "res_עידן חדש" },
+                { text: "מתכונים ואוכל", next: "res_בישול" },
+                { text: "ביוגרפיה (סיפור חיים)", next: "res_ביוגרפיה" },
+                { text: "אחר (רפואה, טבע, הומור)", next: "res_עיון כללי" }
+            ]
+        }
+    };
+
+    function render(stepKey) {
+        const container = document.getElementById('content');
+        
+        if (stepKey.startsWith('res_')) {
+            const category = stepKey.replace('res_', '');
+            container.innerHTML = `
+                <div class="result-box">
+                    <span>הקטגוריה שנמצאה:</span>
+                    <strong class="result-category">${category}</strong>
+                    <p class="keywords">זכור: אם הספר נראה רציני ומחקרי ללא קטגוריה מדויקת, מקומו ב'עיון'.</p>
+                </div>
+                <div class="restart" onclick="render('start')">התחל מחדש</div>
+            `;
+            return;
+        }
+
+        const step = steps[stepKey];
+        let html = `<h1>איתור קטגוריית ספר</h1>`;
+        html += `<div class="question">${step.text}</div>`;
+        html += `<div class="options">`;
+        step.options.forEach(opt => {
+            html += `<button onclick="render('${opt.next}')">${opt.text}</button>`;
+        });
+        html += `</div>`;
+        html += `<div class="restart" onclick="render('start')">חזור להתחלה</div>`;
+        
+        container.innerHTML = html;
+    }
+
+    // הפעלה ראשונית
+    render('start');
+</script>
+
+</body>
+</html>
